@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Pokemon";
+  src: url("./assets/fonts/Pokemon.ttf") format(truetype);
+}
+
+button {
+  cursor: pointer;
+}

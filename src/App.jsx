@@ -1,35 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import FilterButton from "./components/FilterButton";
+import PopUpFilter from "./components/PopUpFilter";
+import { useState } from "react";
+import Overlay from "./components/Overlay";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [popUp, setPopUp] = useState(false);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="h-[200vh] bg-[#2C3152] p-2.5">
+      <h1 className="font-[Pokemon] text-[#FFCB05] w-fit text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mx-auto mb-8 md:mb-12 lg:mb-16 xl:mb-20">
+        Pokedex By Fer
+      </h1>
+      <FilterButton setPopUp={setPopUp} />
+      {popUp && (
+        <div>
+          <Overlay />
+          <PopUpFilter setPopUp={setPopUp} />
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
