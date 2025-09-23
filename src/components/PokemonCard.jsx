@@ -1,4 +1,6 @@
-function PokemonCard({ name, image, number, weight, height }) {
+import PokemonType from "./PokemonType";
+
+function PokemonCard({ name, image, number, weight, height, type1, type2 }) {
   return (
     <div className="p-2.5 relative flex flex-col items-center mt-16 rounded-[60px] bg-[#343D64] min-w-[300px] max-w-[400px]">
       <img
@@ -13,8 +15,13 @@ function PokemonCard({ name, image, number, weight, height }) {
         {name}
       </h3>
 
+      <div className="w-full flex justify-center flex-wrap mb-5">
+        <PokemonType text={type1} />
+        <PokemonType text={type2} />
+      </div>
+
       <div className="flex w-full justify-around">
-        <div className="w-fit">
+        <div className="w-fit flex flex-col items-center">
           <p className="text-white text-xl md:text-2xl w-fit font-[CascadiaCode] font-black">
             Peso
           </p>
@@ -23,7 +30,7 @@ function PokemonCard({ name, image, number, weight, height }) {
           </p>
         </div>
 
-        <div className="w-fit">
+        <div className="w-fit flex flex-col items-center">
           <p className="text-white text-xl md:text-2xl w-fit font-[CascadiaCode] font-black">
             Altura
           </p>

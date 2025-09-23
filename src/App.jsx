@@ -24,16 +24,23 @@ function App() {
             fetch(pokemon.url).then((res) => res.json())
           )
         ).then((details) => {
-          const pokemons = details.map(
-            (data) =>
-              new Pokemon(
-                data.name,
-                data.sprites.other["official-artwork"].front_default,
-                data.id,
-                data.weight,
-                data.height
-              )
-          );
+          const pokemons = details.map((data) => {
+            let type1 = data.types[0].type.name.toUpperCase();
+            let type2;
+            if (data.types.length === 2) {
+              type2 = data.types[1].type.name.toUpperCase();
+            }
+
+            return new Pokemon(
+              data.name,
+              data.sprites.other["official-artwork"].front_default,
+              data.id,
+              data.weight,
+              data.height,
+              type1,
+              type2
+            );
+          });
           setPokemonArray(pokemons);
         });
       });
@@ -64,6 +71,8 @@ function App() {
             number={pokemon.number}
             weight={pokemon.weight}
             height={pokemon.height}
+            type1={pokemon.type1}
+            type2={pokemon.type2}
           />
         ))}
       </div>
