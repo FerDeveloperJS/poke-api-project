@@ -2,7 +2,7 @@ import PokemonType from "./PokemonType";
 import CloseSvg from "../assets/svg/CloseSvg";
 import pokemonTypeArray from "../assets/utils/PokemonTypeArray";
 
-function PopUpFilter({ setPopUp }) {
+function PopUpFilter({ setPopUp, setActualURL }) {
   return (
     <div className="fixed z-20 top-0 left-1/2 -translate-x-1/2 py-10 rounded-2xl bg-white max-w-[700px] mx-auto">
       <h2 className="text-[#FFCB05] font-[Onest] font-bold text-2xl md:text-4xl text-center mb-10">
@@ -11,7 +11,15 @@ function PopUpFilter({ setPopUp }) {
       <ul className="flex flex-wrap gap-5 justify-center">
         {pokemonTypeArray.map((pokemonType) => {
           return (
-            <li key={pokemonType.text}>
+            <li
+              key={pokemonType.text}
+              onClick={() => {
+                setActualURL(
+                  `https://pokeapi.co/api/v2/type/${pokemonType.text.toLowerCase()}/`
+                );
+                setPopUp(false);
+              }}
+            >
               <PokemonType text={pokemonType.text} />
             </li>
           );

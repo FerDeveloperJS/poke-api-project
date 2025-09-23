@@ -17,7 +17,13 @@ function App() {
     fetch(actualURL)
       .then((res) => res.json())
       .then((data) => {
-        const pokemonList = data.results;
+        let pokemonList;
+
+        if (data.results) {
+          pokemonList = data.results;
+        } else {
+          pokemonList = data.pokemon.map((p) => p.pokemon);
+        }
 
         Promise.all(
           pokemonList.map((pokemon) =>
@@ -58,7 +64,7 @@ function App() {
       {popUp && (
         <div>
           <Overlay />
-          <PopUpFilter setPopUp={setPopUp} />
+          <PopUpFilter setPopUp={setPopUp} setActualURL={setActualURL} />
         </div>
       )}
 
