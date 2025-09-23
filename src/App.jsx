@@ -5,6 +5,8 @@ import PokemonCard from "./components/PokemonCard";
 import Overlay from "./components/Overlay";
 import Pokemon from "./Classes/Pokemon";
 import PaginationSelect from "./components/PaginationSelect";
+import convertHeight from "./assets/utils/ConvertHeight";
+import convertWeight from "./assets/utils/ConvertWeight";
 
 function App() {
   const [popUp, setPopUp] = useState(false);
@@ -36,13 +38,15 @@ function App() {
             if (data.types.length === 2) {
               type2 = data.types[1].type.name.toUpperCase();
             }
+            const convertedWeight = convertWeight(data.weight);
+            const convertedHeight = convertHeight(data.height);
 
             return new Pokemon(
               data.name,
               data.sprites.other["official-artwork"].front_default,
               data.id,
-              data.weight,
-              data.height,
+              convertedWeight,
+              convertedHeight,
               type1,
               type2
             );
