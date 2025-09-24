@@ -1,11 +1,20 @@
 import PokemonType from "./PokemonType";
+import Loader from "./Loader";
+import { useState } from "react";
 
 function PokemonCard({ name, image, number, weight, height, type1, type2 }) {
+  const [loaded, setLoaded] = useState(false);
   return (
     <div className="p-2.5 relative flex flex-col items-center mt-16 rounded-[60px] bg-[#343D64] min-w-[300px] max-w-[400px]">
+      {loaded === false && (
+        <div className="fixed w-screen h-screen top-0 left-0 bg-transparent backdrop-blur-3xl z-30">
+          <Loader />
+        </div>
+      )}
       <img
         src={image}
         className="absolute h-[121px] md:h-[140px] w-[121px] md:w-[140px] left-1/2 -translate-x-1/2 -top-20"
+        onLoad={() => setLoaded(true)}
       />
       <h4 className="text-white text-2xl md:text-3xl absolute top-0 left-0">
         {number}
