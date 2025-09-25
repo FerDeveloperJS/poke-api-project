@@ -7,6 +7,10 @@ import Pokemon from "./Classes/Pokemon";
 import PaginationSelect from "./components/PaginationSelect";
 import convertHeight from "./assets/utils/ConvertHeight";
 import convertWeight from "./assets/utils/ConvertWeight";
+import getPokemonsByPage from "./assets/utils/getPokemonsByPage";
+import getTotalPages from "./assets/utils/getTotalPages";
+import RemoveFilterButton from "./components/RemoveFilterButton";
+import PaginationSelectByType from "./components/PaginationSelectByType";
 
 function App() {
   const [popUp, setPopUp] = useState(false);
@@ -14,6 +18,9 @@ function App() {
     "https://pokeapi.co/api/v2/pokemon"
   );
   const [pokemonArray, setPokemonArray] = useState([]);
+  const [filter, setFilter] = useState(false);
+  const [totalPagesByFilter, setTotalPagesByFilter] = useState(1);
+  const [actualPageByFilter, setActualPageByFilter] = useState(1);
 
   useEffect(() => {
     fetch(actualURL)
@@ -24,7 +31,10 @@ function App() {
         if (data.results) {
           pokemonList = data.results;
         } else {
-          pokemonList = data.pokemon.map((p) => p.pokemon);
+          const fullList = data.pokemon.map((p) => p.pokemon);
+          pokemonList = getPokemonsByPage(fullList, actualPageByFilter);
+          const totalPages = getTotalPages(fullList);
+          setTotalPagesByFilter(totalPages);
         }
 
         Promise.all(
@@ -56,6 +66,42 @@ function App() {
       });
   }, [actualURL]);
 
+  useEffect(() => {
+    fetch(actualURL)
+      .then((res) => res.json())
+      .then((data) => {
+        const fullList = data.pokemon.map((p) => p.pokemon);
+        const pokemonList = getPokemonsByPage(fullList, actualPageByFilter);
+
+        Promise.all(
+          pokemonList.map((pokemon) =>
+            fetch(pokemon.url).then((res) => res.json())
+          )
+        ).then((details) => {
+          const pokemons = details.map((data) => {
+            let type1 = data.types[0].type.name.toUpperCase();
+            let type2;
+            if (data.types.length === 2) {
+              type2 = data.types[1].type.name.toUpperCase();
+            }
+            const convertedWeight = convertWeight(data.weight);
+            const convertedHeight = convertHeight(data.height);
+
+            return new Pokemon(
+              data.name,
+              data.sprites.other["official-artwork"].front_default,
+              data.id,
+              convertedWeight,
+              convertedHeight,
+              type1,
+              type2
+            );
+          });
+          setPokemonArray(pokemons);
+        });
+      });
+  }, [actualPageByFilter]);
+
   return (
     <div className="bg-[#2C3152] p-2.5 pb-20">
       <h1
@@ -64,11 +110,17 @@ function App() {
       >
         Pokedex By Fer
       </h1>
-      <FilterButton setPopUp={setPopUp} />
+
+      {filter === false && <FilterButton setPopUp={setPopUp} />}
+      {filter && <RemoveFilterButton />}
       {popUp && (
         <div>
           <Overlay />
-          <PopUpFilter setPopUp={setPopUp} setActualURL={setActualURL} />
+          <PopUpFilter
+            setPopUp={setPopUp}
+            setActualURL={setActualURL}
+            setFilter={setFilter}
+          />
         </div>
       )}
 
@@ -87,7 +139,14 @@ function App() {
         ))}
       </div>
 
-      <PaginationSelect setActualURL={setActualURL} />
+      {filter === false && <PaginationSelect setActualURL={setActualURL} />}
+      {filter && (
+        <PaginationSelectByType
+          numberOfPages={totalPagesByFilter}
+          actualPageByFilter={actualPageByFilter}
+          setActualPageByFilter={setActualPageByFilter}
+        />
+      )}
     </div>
   );
 }
