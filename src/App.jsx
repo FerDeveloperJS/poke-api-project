@@ -11,6 +11,8 @@ import getPokemonsByPage from "./assets/utils/getPokemonsByPage";
 import getTotalPages from "./assets/utils/getTotalPages";
 import RemoveFilterButton from "./components/RemoveFilterButton";
 import PaginationSelectByType from "./components/PaginationSelectByType";
+import SearchSpecificPokemon from "./components/SearchSpecificPokemon";
+import RemoveSearchSpecificPokemonBySearch from "./components/RemoveSearchSpecificPokemonBySearch";
 
 function App() {
   const [popUp, setPopUp] = useState(false);
@@ -21,6 +23,11 @@ function App() {
   const [filter, setFilter] = useState(false);
   const [totalPagesByFilter, setTotalPagesByFilter] = useState(1);
   const [actualPageByFilter, setActualPageByFilter] = useState(1);
+  const [specificPokemonBySearch, setSpecificPokemonBySearch] = useState(false);
+  const [specificPokemonBySearchURL, setSpecificPokemonBySearchURL] =
+    useState("");
+
+  const [actualSpecificPokemon, setActualSpecificPokemon] = useState(null);
 
   useEffect(() => {
     fetch(actualURL)
@@ -102,8 +109,36 @@ function App() {
       });
   }, [actualPageByFilter]);
 
+  useEffect(() => {
+    fetch(specificPokemonBySearchURL)
+      .then((res) => res.json())
+      .then((data) => {
+        const name = data.name;
+        const image = data.sprites.other["official-artwork"].front_default;
+        const id = data.id;
+        const convertedWeight = convertWeight(data.weight);
+        const convertedHeight = convertHeight(data.height);
+        let type1 = data.types[0].type.name.toUpperCase();
+        let type2;
+        if (data.types.length === 2) {
+          type2 = data.types[1].type.name.toUpperCase();
+        }
+        setActualSpecificPokemon(
+          new Pokemon(
+            name,
+            image,
+            id,
+            convertedWeight,
+            convertedHeight,
+            type1,
+            type2
+          )
+        );
+      });
+  }, [specificPokemonBySearchURL]);
+
   return (
-    <div className="bg-[#2C3152] p-2.5 pb-20">
+    <div className="bg-[#2C3152] min-h-screen p-2.5 pb-20">
       <h1
         id="main-title"
         className="font-[Pokemon] text-[#FFCB05] w-fit text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mx-auto mb-8 md:mb-12 lg:mb-16 xl:mb-20"
@@ -111,7 +146,16 @@ function App() {
         Pokedex By Fer
       </h1>
 
-      {filter === false && <FilterButton setPopUp={setPopUp} />}
+      {filter === false && (
+        <SearchSpecificPokemon
+          setSpecificPokemonBySearchURL={setSpecificPokemonBySearchURL}
+          setSpecificPokemonBySearch={setSpecificPokemonBySearch}
+        />
+      )}
+      {specificPokemonBySearch && <RemoveSearchSpecificPokemonBySearch />}
+      {filter === false && specificPokemonBySearch === false && (
+        <FilterButton setPopUp={setPopUp} />
+      )}
       {filter && <RemoveFilterButton />}
       {popUp && (
         <div>
@@ -125,21 +169,35 @@ function App() {
       )}
 
       <div className="mt-10 flex justify-around flex-wrap gap-5 gap-y-16">
-        {pokemonArray.map((pokemon) => (
+        {specificPokemonBySearch === false &&
+          pokemonArray.map((pokemon) => (
+            <PokemonCard
+              key={pokemon.number}
+              name={pokemon.name}
+              image={pokemon.image}
+              number={pokemon.number}
+              weight={pokemon.weight}
+              height={pokemon.height}
+              type1={pokemon.type1}
+              type2={pokemon.type2}
+            />
+          ))}
+        {specificPokemonBySearch && actualSpecificPokemon && (
           <PokemonCard
-            key={pokemon.number}
-            name={pokemon.name}
-            image={pokemon.image}
-            number={pokemon.number}
-            weight={pokemon.weight}
-            height={pokemon.height}
-            type1={pokemon.type1}
-            type2={pokemon.type2}
+            name={actualSpecificPokemon.name}
+            image={actualSpecificPokemon.image}
+            number={actualSpecificPokemon.id}
+            weight={actualSpecificPokemon.weight}
+            height={actualSpecificPokemon.height}
+            type1={actualSpecificPokemon.type1}
+            type2={actualSpecificPokemon.type2}
           />
-        ))}
+        )}
       </div>
 
-      {filter === false && <PaginationSelect setActualURL={setActualURL} />}
+      {filter === false && specificPokemonBySearch === false && (
+        <PaginationSelect setActualURL={setActualURL} />
+      )}
       {filter && (
         <PaginationSelectByType
           numberOfPages={totalPagesByFilter}
